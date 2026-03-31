@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configurações — Orion Flow CRM</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <style>
+        .settings-container {
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        .settings-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .settings-card h2 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 1.2rem;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .settings-card .form-group {
+            margin-bottom: 1rem;
+        }
+        .settings-card label {
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+        .api-key-row {
+            display: flex;
+            gap: 0.5rem;
+            align-items: flex-end;
+        }
+        .api-key-row .form-input {
+            flex: 1;
+        }
+        .btn-test {
+            padding: 0.55rem 1rem;
+            font-size: 0.8rem;
+            white-space: nowrap;
+        }
+        .api-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-size: 0.75rem;
+            margin-top: 0.4rem;
+            font-weight: 500;
+        }
+        .api-status .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+        .api-status.valid { color: var(--accent-green); }
+        .api-status.valid .dot { background: var(--accent-green); box-shadow: 0 0 6px var(--accent-green); }
+        .api-status.invalid { color: var(--accent-red); }
+        .api-status.invalid .dot { background: var(--accent-red); box-shadow: 0 0 6px var(--accent-red); }
+        .api-status.testing { color: var(--text-muted); }
+        .api-status.testing .dot { background: var(--accent-yellow); animation: pulse 1s ease infinite; }
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.85rem;
+            margin-bottom: 1.5rem;
+            transition: color 0.2s;
+        }
+        .back-link:hover { color: var(--accent-cyan); }
+        .settings-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;            
+        }
+        .settings-subtitle {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-bottom: 2rem;
+        }
+        .btn-row {
+            display: flex;
+            gap: 0.75rem;
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-left">
+            <div class="logo">
+                <div class="logo-icon">
+                    <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+                        <circle cx="14" cy="14" r="12" stroke="url(#grad2)" stroke-width="2.5"/>
+                        <circle cx="14" cy="14" r="5" fill="url(#grad2)"/>
+                        <defs>
+                            <linearGradient id="grad2" x1="0" y1="0" x2="28" y2="28">
+                                <stop offset="0%" stop-color="#06b6d4"/>
+                                <stop offset="100%" stop-color="#8b5cf6"/>
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                </div>
+                <div class="logo-text">
+                    <h1>Orion Flow</h1>
+                    <span class="logo-sub">Configurações</span>
+                </div>
+            </div>
+        </div>
+        <div class="header-right">
+            <a href="/" class="btn btn-secondary">← Voltar ao Dashboard</a>
+        </div>
+    </header>
+
+    <div class="settings-container">
+        <a href="/" class="back-link">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+            Voltar ao Dashboard
+        </a>
+        
+        <h1 class="settings-title">⚙️ Configurações</h1>
+        <p class="settings-subtitle">Gerencie suas API keys e parâmetros de busca de leads.</p>
+
+        <!-- API Keys -->
+        <div class="settings-card">
+            <h2>🔑 API Keys</h2>
+            
+            <div class="form-group">
+                <label for="apifyKey">Apify API Key</label>
+                <div class="api-key-row">
+                    <input type="password" id="apifyKey" class="form-input" placeholder="apify_api_...">
+                    <button class="btn btn-secondary btn-test" onclick="testKey('apify')">Testar</button>
+                </div>
+                <div class="api-status" id="apifyStatus"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="claudeKey">Anthropic (Claude) API Key</label>
+                <div class="api-key-row">
+                    <input type="password" id="claudeKey" class="form-input" placeholder="sk-ant-...">
+                    <button class="btn btn-secondary btn-test" onclick="testKey('claude')">Testar</button>
+                </div>
+                <div class="api-status" id="claudeStatus"></div>
+            </div>
+        </div>
+
+        <!-- Search Params -->
+        <div class="settings-card">
+            <h2>🔍 Parâmetros de Busca</h2>
+            
+            <div class="form-group">
+                <label for="searchKeywords">Palavras-chave de busca (separadas por vírgula)</label>
+                <input type="text" id="searchKeywords" class="form-input" placeholder="barbershop, spa, nail salon">
+            </div>
+
+            <div class="form-group">
+                <label for="searchLocation">Localização</label>
+                <input type="text" id="searchLocation" class="form-input" placeholder="Danbury, CT">
+            </div>
+
+            <div class="form-group">
+                <label for="maxLeads">Máximo de leads por busca</label>
+                <input type="number" id="maxLeads" class="form-input" min="1" max="500" placeholder="50">
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="btn-row">
+            <button class="btn btn-primary" onclick="saveSettings()" style="flex:1;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                Salvar Configurações
+            </button>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"><span id="toastMessage"></span></div>
+
+    <script>
+        // Load settings on page load
+        document.addEventListener('DOMContentLoaded', loadSettings);
+
+        async function loadSettings() {
+            try {
+                const res = await fetch('/api/settings');
+                const data = await res.json();
+                const s = data.settings;
+                
+                document.getElementById('apifyKey').value = s.apify_api_key || '';
+                document.getElementById('claudeKey').value = s.anthropic_api_key || '';
+                document.getElementById('searchKeywords').value = s.search_keywords || '';
+                document.getElementById('searchLocation').value = s.search_location || '';
+                document.getElementById('maxLeads').value = s.max_leads_per_search || '50';
+
+                // Show key status
+                updateKeyStatus('apify', data.has_apify_key);
+                updateKeyStatus('claude', data.has_claude_key);
+            } catch (e) {
+                console.error('Error loading settings:', e);
+            }
+        }
+
+        function updateKeyStatus(type, hasKey) {
+            const el = document.getElementById(type === 'apify' ? 'apifyStatus' : 'claudeStatus');
+            if (hasKey) {
+                el.className = 'api-status valid';
+                el.innerHTML = '<span class="dot"></span> Key configurada';
+            } else {
+                el.className = 'api-status invalid';
+                el.innerHTML = '<span class="dot"></span> Nenhuma key configurada';
+            }
+        }
+
+        async function saveSettings() {
+            const data = {
+                apify_api_key: document.getElementById('apifyKey').value,
+                anthropic_api_key: document.getElementById('claudeKey').value,
+                search_keywords: document.getElementById('searchKeywords').value,
+                search_location: document.getElementById('searchLocation').value,
+                max_leads_per_search: document.getElementById('maxLeads').value,
+            };
+
+            try {
+                const res = await fetch('/api/settings', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data),
+                });
+                const result = await res.json();
+                if (result.success) {
+                    showToast('Configurações salvas com sucesso!');
+                    loadSettings();
+                }
+            } catch (e) {
+                showToast('Erro ao salvar configurações');
+            }
+        }
+
+        async function testKey(type) {
+            const statusEl = document.getElementById(type === 'apify' ? 'apifyStatus' : 'claudeStatus');
+            statusEl.className = 'api-status testing';
+            statusEl.innerHTML = '<span class="dot"></span> Testando...';
+
+            // Save the key first if changed
+            await saveSettings();
+
+            try {
+                const body = type === 'apify' ? { test_apify: true } : { test_claude: true };
+                const res = await fetch('/api/settings/test', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(body),
+                });
+                const data = await res.json();
+                const result = data[type];
+                
+                if (result && result.valid) {
+                    statusEl.className = 'api-status valid';
+                    statusEl.innerHTML = '<span class="dot"></span> ✅ Conectada' + (result.username ? ` (${result.username})` : '');
+                } else {
+                    statusEl.className = 'api-status invalid';
+                    statusEl.innerHTML = `<span class="dot"></span> ❌ ${result?.error || 'Erro desconhecido'}`;
+                }
+            } catch (e) {
+                statusEl.className = 'api-status invalid';
+                statusEl.innerHTML = '<span class="dot"></span> ❌ Erro de conexão';
+            }
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastMessage').textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+    </script>
+</body>
+</html>

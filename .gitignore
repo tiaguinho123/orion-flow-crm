@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+*.pyo
+crm.db
+.env
+.vercel/
+*.db-journal
+*.db-wal

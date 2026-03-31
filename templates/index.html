@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orion Flow — CRM Lead Dashboard</title>
+    <meta name="description" content="Dashboard de CRM para gerenciamento de leads e campanhas de outreach">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <!-- ─── Header ──────────────────────────────────────────────── -->
+    <header class="header" id="header">
+        <div class="header-left">
+            <div class="logo">
+                <div class="logo-icon">
+                    <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+                        <circle cx="14" cy="14" r="12" stroke="url(#grad)" stroke-width="2.5"/>
+                        <circle cx="14" cy="14" r="5" fill="url(#grad)"/>
+                        <path d="M14 2 L14 7 M14 21 L14 26 M2 14 L7 14 M21 14 L26 14" stroke="url(#grad)" stroke-width="1.5" stroke-linecap="round"/>
+                        <defs>
+                            <linearGradient id="grad" x1="0" y1="0" x2="28" y2="28">
+                                <stop offset="0%" stop-color="#06b6d4"/>
+                                <stop offset="100%" stop-color="#8b5cf6"/>
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                </div>
+                <div class="logo-text">
+                    <h1>Orion Flow</h1>
+                    <span class="logo-sub">CRM Lead Dashboard</span>
+                </div>
+            </div>
+        </div>
+        <div class="header-right">
+            <div class="header-info">
+                <span class="info-badge" id="lastUpdate">Atualizado agora</span>
+            </div>
+            <button class="btn btn-primary" id="btnGenerate" onclick="generateLeads()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                </svg>
+                🚀 Gerar Leads
+            </button>
+            <button class="btn btn-secondary" id="btnReload" onclick="reloadData()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.2M22 12.5a10 10 0 0 1-18.8 4.2"/>
+                </svg>
+                Recarregar
+            </button>
+            <a href="/settings" class="btn btn-secondary">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+                </svg>
+                Configurações
+            </a>
+        </div>
+    </header>
+
+    <!-- ─── Main Content ────────────────────────────────────────── -->
+    <main class="main" id="mainContent">
+        
+        <!-- Metric Cards -->
+        <section class="metrics-row" id="metricsRow">
+            <div class="metric-card" id="cardTotal">
+                <div class="metric-icon icon-total">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                </div>
+                <div class="metric-content">
+                    <span class="metric-value" id="metricTotal">0</span>
+                    <span class="metric-label">Total de Leads</span>
+                </div>
+            </div>
+            <div class="metric-card" id="cardOpenRate">
+                <div class="metric-icon icon-email">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                </div>
+                <div class="metric-content">
+                    <span class="metric-value" id="metricOpenRate">0%</span>
+                    <span class="metric-label">Taxa de Abertura</span>
+                </div>
+            </div>
+            <div class="metric-card" id="cardClickRate">
+                <div class="metric-icon icon-click">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5"/></svg>
+                </div>
+                <div class="metric-content">
+                    <span class="metric-value" id="metricClickRate">0%</span>
+                    <span class="metric-label">Taxa de Clique</span>
+                </div>
+            </div>
+            <div class="metric-card" id="cardResponseRate">
+                <div class="metric-icon icon-response">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                </div>
+                <div class="metric-content">
+                    <span class="metric-value" id="metricResponseRate">0%</span>
+                    <span class="metric-label">Taxa de Resposta</span>
+                </div>
+            </div>
+            <div class="metric-card" id="cardNegotiation">
+                <div class="metric-icon icon-negotiation">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                </div>
+                <div class="metric-content">
+                    <span class="metric-value" id="metricNegotiation">0</span>
+                    <span class="metric-label">Em Negociação</span>
+                </div>
+            </div>
+            <div class="metric-card" id="cardClosed">
+                <div class="metric-icon icon-closed">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                </div>
+                <div class="metric-content">
+                    <span class="metric-value" id="metricClosed">0</span>
+                    <span class="metric-label">Deals Fechados</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Charts Section -->
+        <section class="charts-section" id="chartsSection">
+            <div class="chart-card chart-funnel" id="chartFunnelCard">
+                <div class="chart-header">
+                    <h2>Funil de Conversão</h2>
+                </div>
+                <div class="chart-body">
+                    <canvas id="funnelChart"></canvas>
+                </div>
+            </div>
+            <div class="chart-card chart-daily" id="chartDailyCard">
+                <div class="chart-header">
+                    <h2>Evolução de Contatos</h2>
+                </div>
+                <div class="chart-body">
+                    <canvas id="dailyChart"></canvas>
+                </div>
+            </div>
+            <div class="chart-card chart-channel" id="chartChannelCard">
+                <div class="chart-header">
+                    <h2>Distribuição por Canal</h2>
+                </div>
+                <div class="chart-body">
+                    <canvas id="channelChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- Leads Table -->
+        <section class="table-section" id="tableSection">
+            <div class="table-header">
+                <h2>Leads</h2>
+                <div class="table-filters">
+                    <div class="filter-group">
+                        <input type="text" id="searchInput" class="filter-input" placeholder="Buscar por nome..." oninput="debounceSearch()">
+                    </div>
+                    <div class="filter-group">
+                        <select id="filterStatus" class="filter-select" onchange="applyFilters()">
+                            <option value="">Todos os Status</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <select id="filterCanal" class="filter-select" onchange="applyFilters()">
+                            <option value="">Todos os Canais</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <select id="filterCategoria" class="filter-select" onchange="applyFilters()">
+                            <option value="">Todas as Categorias</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="table-wrapper">
+                <table class="leads-table" id="leadsTable">
+                    <thead>
+                        <tr>
+                            <th class="th-name">Nome do Negócio</th>
+                            <th>Categoria</th>
+                            <th>Telefone</th>
+                            <th>Avaliação</th>
+                            <th>Reviews</th>
+                            <th>Priority</th>
+                            <th>Canal</th>
+                            <th>Status</th>
+                            <th>Último Contato</th>
+                            <th class="th-actions">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="leadsTableBody">
+                    </tbody>
+                </table>
+            </div>
+            <div class="table-footer" id="tableFooter">
+                <span id="tableCount">0 leads</span>
+            </div>
+        </section>
+    </main>
+
+    <!-- ─── Lead Detail Modal ───────────────────────────────────── -->
+    <div class="modal-overlay" id="leadModal">
+        <div class="modal" id="leadModalContent">
+            <div class="modal-header">
+                <h2 id="modalTitle">Detalhes do Lead</h2>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-grid">
+                    <!-- Info Panel (Editable) -->
+                    <div class="modal-info-panel">
+                        <h3>Informações do Lead</h3>
+                        <div class="info-row">
+                            <span class="info-label">Categoria</span>
+                            <span class="info-value" id="modalCategoria">—</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Endereço</span>
+                            <span class="info-value" id="modalEndereco">—</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Google Rating</span>
+                            <span class="info-value" id="modalRating">—</span>
+                        </div>
+
+                        <h3 class="edit-section-title">Contato & Redes Sociais</h3>
+                        <div class="form-group">
+                            <label for="modalEditTelefone">📞 Telefone</label>
+                            <input type="text" id="modalEditTelefone" class="form-input" placeholder="(203) 555-0000">
+                        </div>
+                        <div class="form-group">
+                            <label for="modalEditEmail">✉️ Email</label>
+                            <input type="email" id="modalEditEmail" class="form-input" placeholder="contato@empresa.com">
+                        </div>
+                        <div class="form-group">
+                            <label for="modalEditSite">🌐 Site</label>
+                            <input type="text" id="modalEditSite" class="form-input" placeholder="www.exemplo.com">
+                        </div>
+                        <div class="form-group">
+                            <label for="modalEditInstagram">📸 Instagram</label>
+                            <input type="text" id="modalEditInstagram" class="form-input" placeholder="@usuario">
+                        </div>
+                        <div class="form-group">
+                            <label for="modalEditFacebook">📘 Facebook</label>
+                            <input type="text" id="modalEditFacebook" class="form-input" placeholder="facebook.com/pagina">
+                        </div>
+                        <div class="form-group">
+                            <label for="modalEditTiktok">🎵 TikTok</label>
+                            <input type="text" id="modalEditTiktok" class="form-input" placeholder="@usuario">
+                        </div>
+                        <div class="form-group">
+                            <label for="modalEditYelp">⭐ Yelp</label>
+                            <input type="text" id="modalEditYelp" class="form-input" placeholder="yelp.com/biz/...">
+                        </div>
+                    </div>
+                    
+                    <!-- Edit Panel -->
+                    <div class="modal-edit-panel">
+                        <h3>Gerenciar Lead</h3>
+                        <input type="hidden" id="modalLeadId">
+                        
+                        <div class="form-group">
+                            <label for="modalStatus">Status</label>
+                            <select id="modalStatus" class="form-select"></select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="modalCanal">Canal de Abordagem</label>
+                            <select id="modalCanal" class="form-select"></select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="modalScore">Score de Prioridade (1-10)</label>
+                            <input type="number" id="modalScore" class="form-input" min="1" max="10" step="1">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="modalDataContato">Data do Último Contato</label>
+                            <input type="date" id="modalDataContato" class="form-input">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="modalProximoPasso">Próximo Passo</label>
+                            <input type="text" id="modalProximoPasso" class="form-input" placeholder="Ex: Enviar proposta...">
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group form-check">
+                                <input type="checkbox" id="modalEmailAberto">
+                                <label for="modalEmailAberto">Email Aberto</label>
+                            </div>
+                            <div class="form-group form-check">
+                                <input type="checkbox" id="modalEmailClicou">
+                                <label for="modalEmailClicou">Clicou no Link</label>
+                            </div>
+                        </div>
+                        
+                        <!-- Research Checklist -->
+                        <div class="research-section" id="researchSection">
+                            <div class="research-header">
+                                <h3>📋 Research Checklist</h3>
+                                <div class="research-progress-info">
+                                    <span id="researchCount">0/16 items</span>
+                                </div>
+                            </div>
+                            <div class="research-progress-bar">
+                                <div class="research-progress-fill" id="researchProgressFill" style="width:0%"></div>
+                            </div>
+
+                            <!-- Instagram Category -->
+                            <div class="research-category">
+                                <div class="research-cat-header">📸 INSTAGRAM</div>
+                                <div class="research-item" data-key="ig_has_profile">
+                                    <input type="checkbox" class="ri-check" data-key="ig_has_profile">
+                                    <span class="ri-label">Has Instagram profile?</span>
+                                    <input type="text" class="ri-note" data-key="ig_has_profile" placeholder="yes / no">
+                                </div>
+                                <div class="research-item" data-key="ig_followers">
+                                    <input type="checkbox" class="ri-check" data-key="ig_followers">
+                                    <span class="ri-label">How many followers?</span>
+                                    <input type="text" class="ri-note" data-key="ig_followers" placeholder="e.g. 127 followers">
+                                </div>
+                                <div class="research-item" data-key="ig_last_post">
+                                    <input type="checkbox" class="ri-check" data-key="ig_last_post">
+                                    <span class="ri-label">When was the last post?</span>
+                                    <input type="text" class="ri-note" data-key="ig_last_post" placeholder="e.g. 3 months ago">
+                                </div>
+                                <div class="research-item" data-key="ig_bio_complete">
+                                    <input type="checkbox" class="ri-check" data-key="ig_bio_complete">
+                                    <span class="ri-label">Is the bio complete?</span>
+                                    <input type="text" class="ri-note" data-key="ig_bio_complete" placeholder="yes / no / missing info">
+                                </div>
+                                <div class="research-item" data-key="ig_link_in_bio">
+                                    <input type="checkbox" class="ri-check" data-key="ig_link_in_bio">
+                                    <span class="ri-label">Has link in bio?</span>
+                                    <input type="text" class="ri-note" data-key="ig_link_in_bio" placeholder="yes / no / broken link">
+                                </div>
+                            </div>
+
+                            <!-- Facebook Category -->
+                            <div class="research-category">
+                                <div class="research-cat-header">📘 FACEBOOK</div>
+                                <div class="research-item" data-key="fb_has_page">
+                                    <input type="checkbox" class="ri-check" data-key="fb_has_page">
+                                    <span class="ri-label">Has Facebook page?</span>
+                                    <input type="text" class="ri-note" data-key="fb_has_page" placeholder="yes / no">
+                                </div>
+                                <div class="research-item" data-key="fb_active">
+                                    <input type="checkbox" class="ri-check" data-key="fb_active">
+                                    <span class="ri-label">Is it active?</span>
+                                    <input type="text" class="ri-note" data-key="fb_active" placeholder="yes / no / abandoned">
+                                </div>
+                                <div class="research-item" data-key="fb_last_post">
+                                    <input type="checkbox" class="ri-check" data-key="fb_last_post">
+                                    <span class="ri-label">When was the last post?</span>
+                                    <input type="text" class="ri-note" data-key="fb_last_post" placeholder="e.g. 2021">
+                                </div>
+                            </div>
+
+                            <!-- Website Category -->
+                            <div class="research-category">
+                                <div class="research-cat-header">🌐 WEBSITE</div>
+                                <div class="research-item" data-key="ws_has_website">
+                                    <input type="checkbox" class="ri-check" data-key="ws_has_website">
+                                    <span class="ri-label">Has a website?</span>
+                                    <input type="text" class="ri-note" data-key="ws_has_website" placeholder="yes / no">
+                                </div>
+                                <div class="research-item" data-key="ws_mobile">
+                                    <input type="checkbox" class="ri-check" data-key="ws_mobile">
+                                    <span class="ri-label">Loads on mobile?</span>
+                                    <input type="text" class="ri-note" data-key="ws_mobile" placeholder="yes / no / slow">
+                                </div>
+                                <div class="research-item" data-key="ws_booking">
+                                    <input type="checkbox" class="ri-check" data-key="ws_booking">
+                                    <span class="ri-label">Has online booking?</span>
+                                    <input type="text" class="ri-note" data-key="ws_booking" placeholder="yes / no / phone only">
+                                </div>
+                                <div class="research-item" data-key="ws_contact_form">
+                                    <input type="checkbox" class="ri-check" data-key="ws_contact_form">
+                                    <span class="ri-label">Has contact form?</span>
+                                    <input type="text" class="ri-note" data-key="ws_contact_form" placeholder="yes / no">
+                                </div>
+                            </div>
+
+                            <!-- Google Category -->
+                            <div class="research-category">
+                                <div class="research-cat-header">📍 GOOGLE</div>
+                                <div class="research-item" data-key="go_profile_complete">
+                                    <input type="checkbox" class="ri-check" data-key="go_profile_complete">
+                                    <span class="ri-label">Google profile complete?</span>
+                                    <input type="text" class="ri-note" data-key="go_profile_complete" placeholder="yes / no / missing hours">
+                                </div>
+                                <div class="research-item" data-key="go_has_photos">
+                                    <input type="checkbox" class="ri-check" data-key="go_has_photos">
+                                    <span class="ri-label">Has photos?</span>
+                                    <input type="text" class="ri-note" data-key="go_has_photos" placeholder="yes / no / few">
+                                </div>
+                                <div class="research-item" data-key="go_responds_reviews">
+                                    <input type="checkbox" class="ri-check" data-key="go_responds_reviews">
+                                    <span class="ri-label">Responds to reviews?</span>
+                                    <input type="text" class="ri-note" data-key="go_responds_reviews" placeholder="yes / no / sometimes">
+                                </div>
+                                <div class="research-item" data-key="go_review_count">
+                                    <input type="checkbox" class="ri-check" data-key="go_review_count">
+                                    <span class="ri-label">How many reviews?</span>
+                                    <input type="text" class="ri-note" data-key="go_review_count" placeholder="e.g. 12 reviews">
+                                </div>
+                            </div>
+
+                            <button type="button" class="btn btn-primary btn-full btn-summary" id="btnResearchSummary" onclick="generateResearchSummary()">
+                                📝 Generate Research Summary
+                            </button>
+                        </div>
+
+                        <!-- Notes (auto-filled by research summary) -->
+                        <div class="form-group notes-enhanced-group">
+                            <div class="notes-header">
+                                <label for="modalNotas">📝 Research Notes</label>
+                                <div class="notes-header-actions">
+                                    <span class="autosave-indicator" id="autosaveIndicator" style="display:none;">✓ Saved</span>
+                                    <span class="char-counter" id="charCounter">0 chars</span>
+                                </div>
+                            </div>
+                            <textarea id="modalNotas" class="form-textarea notes-textarea" rows="4" placeholder="Notes will be auto-generated from the research checklist above. You can also edit manually."></textarea>
+                        </div>
+                        
+                        <button class="btn btn-primary btn-full" onclick="saveLead()">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                            Salvar Alterações
+                        </button>
+
+                        <!-- Funnel Action Zone -->
+                        <div id="funnelZone" style="margin-top:1.5rem;padding:1rem;background:var(--bg-input);border-radius:var(--radius-sm);border:1px solid var(--border-color);">
+                            <div id="funnelStatusBadge" style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.75rem;"></div>
+                            <div id="funnelNextStep" style="font-size:0.8rem;color:var(--text-secondary);margin-bottom:1rem;"></div>
+                            <div id="funnelAlertZone" style="display:none;margin-bottom:1rem;"></div>
+                            <div id="funnelActionBtn"></div>
+                            <div id="funnelLoading" style="display:none;text-align:center;padding:1rem;">
+                                <div style="display:inline-block;width:24px;height:24px;border:3px solid var(--border-color);border-top-color:var(--accent-purple);border-radius:50%;animation:spin 0.8s linear infinite;"></div>
+                                <div style="font-size:0.8rem;color:var(--text-secondary);margin-top:0.5rem;">Generating with AI...</div>
+                            </div>
+                        </div>
+
+                        <!-- History -->
+                        <div class="history-section">
+                            <h3>Histórico de Interações</h3>
+                            <div class="history-list" id="historyList">
+                                <p class="history-empty">Nenhuma interação registrada.</p>
+                            </div>
+                        </div>
+
+                        <!-- Generated Messages History -->
+                        <div class="history-section" id="messagesSection" style="display:none;">
+                            <h3 style="cursor:pointer;" onclick="toggleMessagesHistory()">
+                                ✍️ Message History <span id="msgToggleIcon">▼</span>
+                            </h3>
+                            <div id="messagesList"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ─── Generate Progress Modal ─────────────────────────────── -->
+    <div class="modal-overlay" id="generateModal">
+        <div class="modal" style="max-width:560px;">
+            <div class="modal-header">
+                <h2>🚀 Gerando Leads</h2>
+                <button class="modal-close" onclick="closeGenerateModal()" id="btnCloseGenerate">&times;</button>
+            </div>
+            <div class="modal-body" style="padding:1.5rem;">
+                <div class="gen-status-text" id="genPhase" style="font-size:0.9rem;color:var(--text-secondary);margin-bottom:1rem;">
+                    Preparando...
+                </div>
+                <div class="gen-progress-bar" style="background:var(--bg-input);border-radius:8px;height:12px;overflow:hidden;margin-bottom:0.75rem;">
+                    <div id="genProgressFill" style="height:100%;width:0%;background:var(--gradient-primary);border-radius:8px;transition:width 0.3s ease;"></div>
+                </div>
+                <div id="genCounter" style="font-size:0.82rem;color:var(--text-muted);margin-bottom:1rem;">
+                    0 / 0
+                </div>
+                <div id="genLog" style="background:var(--bg-input);border:1px solid var(--border-color);border-radius:var(--radius-sm);padding:0.75rem;max-height:220px;overflow-y:auto;font-size:0.75rem;font-family:'Inter',monospace;color:var(--text-secondary);line-height:1.6;">
+                    <div>Aguardando início...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast">
+        <span id="toastMessage"></span>
+    </div>
+
+    <script src="/static/js/charts.js"></script>
+    <script src="/static/js/table.js"></script>
+    <script src="/static/js/app.js"></script>
+</body>
+</html>
