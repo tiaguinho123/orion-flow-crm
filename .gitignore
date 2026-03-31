@@ -6,3 +6,5 @@ crm.db
 .vercel/
 *.db-journal
 *.db-wal
+
+.vercel
